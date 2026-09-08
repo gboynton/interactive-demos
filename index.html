@@ -1,454 +1,949 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Interactive teaching demonstrations by Geoffrey M. Boynton, University of Washington.">
-  <title>Interactive Teaching Demonstrations | Geoffrey M. Boynton</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Central Limit Theorem Interactive Module</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
-    :root {
-      --uw-purple: #4b2e83;
-      --uw-purple-dark: #2f1b55;
-      --uw-gold: #b7a57a;
-      --ink: #202124;
-      --muted: #62666d;
-      --line: #e3e5e8;
-      --paper: #ffffff;
-      --wash: #f6f5f8;
-      --shadow: 0 8px 24px rgba(29, 20, 46, 0.08);
-      --radius: 16px;
-      --max-width: 1120px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--ink);
-      background: var(--wash);
-      line-height: 1.55;
+      padding: 16px;
+      background: #ffffff;
+      color: #222;
     }
 
-    a {
-      color: inherit;
-    }
-
-    .hero {
-      background:
-        radial-gradient(circle at 85% 20%, rgba(183,165,122,0.24), transparent 28%),
-        linear-gradient(135deg, var(--uw-purple-dark), var(--uw-purple));
-      color: white;
-      padding: 56px 24px 48px;
-    }
-
-    .hero-inner,
-    main,
-    footer .footer-inner {
-      width: min(var(--max-width), calc(100% - 40px));
+    .module {
+      max-width: 900px;
       margin: 0 auto;
-    }
-
-    .eyebrow {
-      margin: 0 0 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #e8dfc9;
-    }
-
-    h1 {
-      margin: 0;
-      max-width: 850px;
-      font-size: clamp(2.1rem, 5vw, 4rem);
-      line-height: 1.06;
-      letter-spacing: -0.035em;
-    }
-
-    .hero p {
-      max-width: 760px;
-      margin: 18px 0 0;
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      color: rgba(255,255,255,0.9);
-    }
-
-    .hero-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .hero-links a {
-      text-decoration: none;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.42);
-      background: rgba(255,255,255,0.08);
-      font-weight: 650;
-      font-size: 0.94rem;
-    }
-
-    .hero-links a:hover,
-    .hero-links a:focus-visible {
-      background: rgba(255,255,255,0.16);
-      outline: none;
-    }
-
-    main {
-      padding: 38px 0 58px;
-    }
-
-    .intro {
-      margin-bottom: 30px;
-      color: var(--muted);
-      max-width: 860px;
-    }
-
-    section {
-      margin-top: 38px;
-    }
-
-    .section-heading {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 9px;
-      margin-bottom: 18px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
     h2 {
-      margin: 0;
-      color: var(--uw-purple-dark);
-      font-size: 1.55rem;
-      letter-spacing: -0.015em;
+      margin: 0 0 12px;
+      font-size: 1.25rem;
+      font-weight: 650;
     }
 
-    .count {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .grid {
+    .controls {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 12px 20px;
+      align-items: end;
+      margin-bottom: 10px;
     }
 
-    .card {
+    .control-group {
       display: flex;
       flex-direction: column;
-      min-height: 235px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
+      gap: 4px;
+      font-size: 0.95rem;
     }
 
-    .tag {
-      width: fit-content;
-      margin-bottom: 10px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: #f0edf6;
-      color: var(--uw-purple);
-      font-size: 0.76rem;
-      font-weight: 750;
-      letter-spacing: 0.035em;
-      text-transform: uppercase;
+    label {
+      font-weight: 600;
     }
 
-    .card h3 {
-      margin: 0;
-      color: var(--uw-purple-dark);
-      font-size: 1.28rem;
-      line-height: 1.25;
+    select, input[type="range"], input[type="number"], button {
+      font-size: 0.95rem;
     }
 
-    .card p {
-      margin: 10px 0 18px;
-      color: var(--muted);
-      flex: 1;
+    select, input[type="number"] {
+      padding: 6px 8px;
+      border-radius: 7px;
+      border: 1px solid #bbb;
+      background: white;
     }
 
-    .actions {
+    .slider-row {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      margin-top: auto;
-    }
-
-    .button {
-      display: inline-block;
-      text-decoration: none;
-      border-radius: 9px;
-      padding: 9px 12px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      transition: transform 0.12s ease, background 0.12s ease;
-    }
-
-    .button:hover {
-      transform: translateY(-1px);
-    }
-
-    .primary {
-      background: var(--uw-purple);
-      color: white;
-    }
-
-    .primary:hover,
-    .primary:focus-visible {
-      background: var(--uw-purple-dark);
-    }
-
-    .secondary {
-      background: #f3f3f5;
-      color: #343238;
-      border: 1px solid #dddde2;
-    }
-
-    .secondary:hover,
-    .secondary:focus-visible {
-      background: #e9e9ed;
-    }
-
-    footer {
-      border-top: 5px solid var(--uw-gold);
-      background: #242126;
-      color: #dad7de;
-      padding: 28px 0;
-    }
-
-    .footer-inner {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 14px 24px;
       align-items: center;
     }
 
-    footer p {
-      margin: 0;
-      font-size: 0.92rem;
+    input[type="range"] {
+      flex: 1;
     }
 
-    footer a {
-      color: white;
-      text-underline-offset: 3px;
+    .sample-size-value {
+      min-width: 6.5em;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
-    @media (max-width: 760px) {
-      .hero {
-        padding-top: 42px;
-      }
+    .hint {
+      font-size: 0.82rem;
+      color: #666;
+      margin-top: 2px;
+    }
 
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 6px;
+    }
 
-      .card {
-        min-height: auto;
-      }
+    button {
+      padding: 7px 14px;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      background: #f7f7f7;
+      cursor: pointer;
+      font-weight: 650;
+    }
 
-      .hero-inner,
-      main,
-      footer .footer-inner {
-        width: min(var(--max-width), calc(100% - 28px));
-      }
+    button:hover { background: #eeeeee; }
+    button:active { transform: translateY(1px); }
+
+    .stats-row, .sampling-stats-row {
+      margin: 8px 0 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .plots {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .plot {
+      width: 100%;
+      height: 290px;
+    }
+
+    .status {
+      margin-top: 8px;
+      color: #555;
+      font-size: 0.9rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 500px) {
+      .controls { grid-template-columns: 1fr; }
+      .plot { height: 260px; }
+      .slider-row { flex-wrap: wrap; }
+      .sample-size-value { text-align: left; }
     }
   </style>
 </head>
-
 <body>
-  <header class="hero">
-    <div class="hero-inner">
-      <h1>Interactive Teaching Demos</h1>
-      <p>
-        Browser-based demonstrations for statistics, perception, geometry, and related teaching.
-       The source code is publicly available at <a href="https://github.com/gboynton" target="_blank" rel="noopener">GitHub: gboynton</a>.
-      </p>
+  <div class="module">
+    <h2>Central Limit Theorem</h2>
 
-      <nav class="hero-links" aria-label="Page sections">
-        <a href="#statistics">Statistics</a>
-        <a href="#vision">Vision &amp; Perception</a>
-        <a href="#geometry">Geometry</a>
-        <a href="#other">Physics &amp; Games</a>
-      </nav>
+    <div class="controls">
+      <div class="control-group">
+        <label for="distSelect">Population distribution</label>
+        <select id="distSelect">
+          <option value="normal">Normal</option>
+          <option value="uniform">Uniform</option>
+          <option value="bimodal">Bimodal</option>
+          <option value="binomial">Binomial</option>
+          <option value="chisq">Chi-squared χ²(df)</option>
+          <option value="exponential">Exponential</option>
+          <option value="cauchy">Cauchy</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="sampleSize">Sample size</label>
+        <div class="slider-row">
+          <input id="sampleSize" type="range" min="0" max="1000" value="233" step="1" />
+          <input id="sampleSizeInput" type="number" min="1" max="1000" value="9" step="1" style="width: 5.5em;" />
+          
+        </div>
+        
+      </div>
+
+      <div class="control-group">
+        <label for="populationMeanInput">Population mean</label>
+        <input id="populationMeanInput" type="number" value="0" step="0.1" />
+      </div>
+
+      <div class="control-group">
+        <label for="populationSdInput">Population standard deviation</label>
+        <input id="populationSdInput" type="number" value="1" min="0.001" step="0.1" />
+      </div>
+
+      <div id="chiDfControl" class="control-group" style="display:none;">
+        <label for="chiDfInput">Chi-squared degrees of freedom</label>
+        <input id="chiDfInput" type="number" value="4" min="1" max="50" step="1" />
+      </div>
     </div>
-  </header>
 
-  <main>
-    <p class="intro">
-      These demonstrations are intended for classroom use and exploration. Most are self-contained
-      HTML/JavaScript pages: choose a module below to launch it, or follow the source link to inspect,
-      download, or season to taste.
-    </p>
-
-    <p> Geoffrey M. Boynton, Department of Psychology, University of Washington</p>
-
-    <section id="statistics">
-      <div class="section-heading">
-        <h2>Statistics</h2>
-        <span class="count">4 modules</span>
-      </div>
-
-      <div class="grid">
-        <article class="card">
-          <span class="tag">Sampling distributions</span>
-          <h3>Central Limit Theorem</h3>
-          <p>
-            Explore how sampling distributions emerge from different population distributions.
-            Adjust sample size and population parameters, sample repeatedly, and compare the results
-            with theoretical and normal predictions.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/clt-interactive/" target="_blank" rel="noopener">Launch Demo</a>
-            <a class="button secondary" href="https://github.com/gboynton/clt-interactive" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <span class="tag">Probability</span>
-          <h3>Normal Distribution</h3>
-          <p>
-            An interactive demonstration of areas under the normal distribution, useful for
-            visualizing probabilities, cutoffs, and the relationship between locations on the
-            distribution and enclosed area.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/normal-distribution-demo/" target="_blank" rel="noopener">Launch Demo</a>
-            <a class="button secondary" href="https://github.com/gboynton/normal-distribution-demo" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <span class="tag">Hypothesis testing</span>
-          <h3>Statistical Power for a z-Test</h3>
-          <p>
-            Visualize statistical power using the classic pair of normal distributions. Adjust the
-            null and true means, standard deviation, sample size, alpha level, and number of tails.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/power_z/" target="_blank" rel="noopener">Launch Demo</a>
-            <a class="button secondary" href="https://github.com/gboynton/power_z" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <span class="tag">ANOVA</span>
-          <h3>The F Statistic</h3>
-          <p>
-            Demonstrates the F statistic as a ratio of variability between group means to variability
-            within groups, with repeated sampling to make the logic of one-factor ANOVA visible.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/F/" target="_blank" rel="noopener">Launch Demo</a>
-            <a class="button secondary" href="https://github.com/gboynton/F" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="vision">
-      <div class="section-heading">
-        <h2>Vision &amp; Perception</h2>
-        <span class="count">2 modules</span>
-      </div>
-
-      <div class="grid">
-        <article class="card">
-          <span class="tag">Brightness perception</span>
-          <h3>Checker-Shadow Illusion</h3>
-          <p>
-            An interactive version of Edward Adelson's classic checker-shadow illusion, illustrating
-            how context and inferred illumination can strongly influence perceived surface brightness.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/checker-shadow-illusion-demo/" target="_blank" rel="noopener">Launch Demo</a>
-            <a class="button secondary" href="https://github.com/gboynton/checker-shadow-illusion-demo" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <span class="tag">Brightness perception</span>
-          <h3>Brightness Illusion</h3>
-          <p>
-            A browser-based perceptual demonstration showing how surrounding image structure changes
-            the appearance of physically defined luminance or brightness.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/brightness-illusion-demo/" target="_blank" rel="noopener">Launch Demo</a>
-            <a class="button secondary" href="https://github.com/gboynton/brightness-illusion-demo" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="geometry">
-      <div class="section-heading">
-        <h2>Geometry</h2>
-        <span class="count">1 collection</span>
-      </div>
-
-      <div class="grid">
-        <article class="card">
-          <span class="tag">Circle theorems</span>
-          <h3>Interactive Circle-Theorem Demos</h3>
-          <p>
-            A collection of interactive geometry demonstrations covering circle theorems including
-            angles at the center, cyclic quadrilaterals, tangents, chords, semicircles, and related results.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/circle-theorem-demos/" target="_blank" rel="noopener">Launch Collection</a>
-            <a class="button secondary" href="https://github.com/gboynton/circle-theorem-demos" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="other">
-      <div class="section-heading">
-        <h2>Physics &amp; Games</h2>
-        <span class="count">1 module</span>
-      </div>
-
-      <div class="grid">
-        <article class="card">
-          <span class="tag">Projectile motion</span>
-          <h3>Ballistics</h3>
-          <p>
-            A two-player browser game based on projectile motion, with adjustable firing parameters
-            and environmental effects. A playful way to explore trajectories and basic ballistics.
-          </p>
-          <div class="actions">
-            <a class="button primary" href="https://gboynton.github.io/ballistics/" target="_blank" rel="noopener">Launch Game</a>
-            <a class="button secondary" href="https://github.com/gboynton/ballistics" target="_blank" rel="noopener">View Source</a>
-          </div>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-inner">
-      <p>
-        Geoffrey M. Boynton · Department of Psychology · University of Washington
-      </p>
-      <p>
-        <a href="https://github.com/gboynton" target="_blank" rel="noopener">GitHub: gboynton</a>
-      </p>
+    <div class="button-row">
+      <button id="goBtn">GO</button>
+      <button id="stepBtn">STEP</button>
+      <button id="pauseBtn">PAUSE</button>
+      <button id="resetBtn">RESET</button>
+      
+      
     </div>
-  </footer>
+
+    <div id="statsRow" class="stats-row"></div>
+
+    <div class="plots">
+      <div id="populationPlot" class="plot"></div>
+      <div id="samplingStatsRow" class="sampling-stats-row"></div>
+      <div id="samplingPlot" class="plot"></div>
+    </div>
+
+    <div id="status" class="status" style="display:flex; gap:16px; align-items:center;">
+      <label style="display:flex; align-items:center; gap:6px; font-weight:600;">
+        <input id="matchPopulationRangeToggle" type="checkbox" />
+        Match population x-axis
+      </label>
+      <label style="display:flex; align-items:center; gap:6px; font-weight:600;">
+        <input id="normalToggle" type="checkbox" checked />
+        Show normal prediction
+      </label>
+
+      <label style="display:flex; align-items:center; gap:6px; font-weight:600;">
+        <input id="theoryToggle" type="checkbox" />
+        Show theoretical distribution
+      </label>
+    </div>
+  </div>
+
+  <script>
+    const distSelect = document.getElementById("distSelect");
+    const sampleSizeSlider = document.getElementById("sampleSize");
+    const sampleSizeInput = document.getElementById("sampleSizeInput");
+    const sampleSizeValue = document.getElementById("sampleSizeValue");
+    const populationMeanInput = document.getElementById("populationMeanInput");
+    const populationSdInput = document.getElementById("populationSdInput");
+    const chiDfInput = document.getElementById("chiDfInput");
+    const chiDfControl = document.getElementById("chiDfControl");
+    const goBtn = document.getElementById("goBtn");
+    const stepBtn = document.getElementById("stepBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const normalToggle = document.getElementById("normalToggle");
+    const theoryToggle = document.getElementById("theoryToggle");
+    const matchPopulationRangeToggle = document.getElementById("matchPopulationRangeToggle");
+    const statsRow = document.getElementById("statsRow");
+    const samplingStatsRow = document.getElementById("samplingStatsRow");
+    const statusText = document.getElementById("status");
+
+    let sampleMeans = [];
+    let currentSample = [];
+    let timer = null;
+    let running = false;
+
+    let activeSampleSize = 9;
+    let pendingSampleSize = 9;
+    let activeDistributionValue = distSelect.value;
+    let activeMean = 0;
+    let pendingMean = 0;
+    let activeSd = 1;
+    let pendingSd = 1;
+    let activeChiDf = 4;
+    let pendingChiDf = 4;
+
+    const maxMeansToStore = Number.POSITIVE_INFINITY;
+    const msPerIteration = 100;
+    const updateEveryAfterThreshold = 100;
+    const updateEveryNSamples = 10;
+    const fastBatchSize = 10;
+    const samplingBinCount = 200;
+    const samplingRangeInSE = 5;
+
+    const baseDistributions = {
+      normal: {
+        xMin: -4,
+        xMax: 4,
+        mean: 0,
+        sd: 1,
+        sample: () => randn(),
+        density: z => normalPdf(z, 0, 1)
+      },
+      uniform: {
+        xMin: -2,
+        xMax: 2,
+        mean: 0,
+        sd: Math.sqrt(1 / 3),
+        sample: () => -1 + 2 * Math.random(),
+        density: z => (z >= -1 && z <= 1 ? 0.5 : 0)
+      },
+      bimodal: {
+        xMin: -5,
+        xMax: 5,
+        mean: 0,
+        sd: Math.sqrt(4.25),
+        sample: () => (Math.random() < 0.5 ? randn() * 0.5 - 2 : randn() * 0.5 + 2),
+        density: z => 0.5 * normalPdf(z, -2, 0.5) + 0.5 * normalPdf(z, 2, 0.5)
+      },
+      binomial: {
+        xMin: -0.5,
+        xMax: 1.5,
+        mean: 0.5,
+        sd: 0.5,
+        sample: () => (Math.random() < 0.5 ? 1 : 0),
+        discrete: true,
+        support: [0, 1],
+        pmf: k => (k === 0 || k === 1 ? 0.5 : 0)
+      },
+      chisq: {
+        xMin: 0,
+        xMax: 12,
+        mean: 2,
+        sd: 2,
+        sample: () => rchisq(activeChiDf),
+        density: z => chisqPdf(z, activeChiDf),
+        variableDf: true
+      },
+      exponential: {
+        xMin: 0,
+        xMax: 8,
+        mean: 1,
+        sd: 1,
+        sample: () => -Math.log(1 - Math.random()),
+        density: z => z < 0 ? 0 : Math.exp(-z)
+      },
+      cauchy: {
+        xMin: -10,
+        xMax: 10,
+        mean: NaN,
+        sd: NaN,
+        sample: () => Math.tan(Math.PI * (Math.random() - 0.5)),
+        density: z => 1 / (Math.PI * (1 + z * z)),
+        noFiniteMoments: true
+      }
+    };
+
+    function randn() {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+
+    function normalPdf(x, mu, sigma) {
+      const z = (x - mu) / sigma;
+      return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI));
+    }
+
+    function logGamma(z) {
+      // Lanczos approximation, accurate enough for this teaching demo.
+      const p = [
+        676.5203681218851,
+        -1259.1392167224028,
+        771.32342877765313,
+        -176.61502916214059,
+        12.507343278686905,
+        -0.13857109526572012,
+        9.9843695780195716e-6,
+        1.5056327351493116e-7
+      ];
+      if (z < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
+      z -= 1;
+      let x = 0.99999999999980993;
+      for (let i = 0; i < p.length; i++) x += p[i] / (z + i + 1);
+      const t = z + p.length - 0.5;
+      return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+    }
+
+    function chisqPdf(x, df) {
+      if (x < 0) return 0;
+      if (x === 0 && df === 2) return 0.5;
+      if (x === 0) return df < 2 ? Infinity : 0;
+      const k = df / 2;
+      return Math.exp((k - 1) * Math.log(x) - x / 2 - k * Math.log(2) - logGamma(k));
+    }
+
+    function rchisq(df) {
+      let out = 0;
+      for (let i = 0; i < df; i++) {
+        const z = randn();
+        out += z * z;
+      }
+      return out;
+    }
+
+    function mean(values) {
+      return values.reduce((a, b) => a + b, 0) / values.length;
+    }
+
+    function sampleSd(values) {
+      if (values.length < 2) return 0;
+      const m = mean(values);
+      const ss = values.reduce((a, b) => a + Math.pow(b - m, 2), 0);
+      return Math.sqrt(ss / (values.length - 1));
+    }
+
+    function linspace(a, b, n) {
+      const out = [];
+      const step = (b - a) / (n - 1);
+      for (let i = 0; i < n; i++) out.push(a + i * step);
+      return out;
+    }
+
+    function sliderToSampleSize(sliderValue) {
+      return Math.round(Math.pow(10, Number(sliderValue) / 1000 * 3));
+    }
+
+    function sampleSizeToSlider(n) {
+      const clamped = Math.max(1, Math.min(1000, Number(n)));
+      return Math.round((Math.log10(clamped) / 3) * 1000);
+    }
+
+    function cleanSampleSize(n) {
+      return Math.max(1, Math.min(1000, Math.round(Number(n) || 1)));
+    }
+
+    function getSampleSize() {
+      return activeSampleSize;
+    }
+
+    function getDisplayDistribution() {
+      let base = baseDistributions[activeDistributionValue];
+      if (!base) {
+        console.warn(`Unknown distribution '${activeDistributionValue}'. Falling back to normal.`);
+        activeDistributionValue = "normal";
+        distSelect.value = "normal";
+        base = baseDistributions.normal;
+      }
+      if (activeDistributionValue === "chisq") {
+        base = {
+          ...base,
+          xMax: Math.max(12, activeChiDf + 6 * Math.sqrt(2 * activeChiDf)),
+          mean: activeChiDf,
+          sd: Math.sqrt(2 * activeChiDf),
+          sample: () => rchisq(activeChiDf),
+          density: z => chisqPdf(z, activeChiDf)
+        };
+      }
+      const mu = activeMean;
+      const sigma = activeSd;
+
+      // Special case for the two-point binomial/Bernoulli display.
+      // Here sigma controls the distance between the two population values,
+      // so values are shown at mu ± sigma/2.
+      if (activeDistributionValue === "binomial") {
+        const support = [mu - sigma / 2, mu + sigma / 2];
+        return {
+          ...base,
+          xMin: mu - sigma,
+          xMax: mu + sigma,
+          mean: mu,
+          sd: sigma,
+          sample: () => (Math.random() < 0.5 ? support[0] : support[1]),
+          support: support,
+          pmf: x => (Math.abs(x - support[0]) < 1e-12 || Math.abs(x - support[1]) < 1e-12 ? 0.5 : 0),
+          discrete: true
+        };
+      }
+
+      // Special case for Cauchy: the entered "mean" and "SD" act as
+      // location and scale. The population has no finite mean or SD.
+      if (activeDistributionValue === "cauchy") {
+        return {
+          ...base,
+          xMin: mu - 10 * sigma,
+          xMax: mu + 10 * sigma,
+          mean: NaN,
+          sd: NaN,
+          location: mu,
+          scale: sigma,
+          sample: () => mu + sigma * base.sample(),
+          density: x => base.density((x - mu) / sigma) / sigma,
+          noFiniteMoments: true,
+          discrete: false
+        };
+      }
+
+      // For the other distributions, rescale the base distribution so that
+      // the displayed population has the requested mean and standard deviation.
+      const scale = sigma / base.sd;
+      const low = mu + scale * (base.xMin - base.mean);
+      const high = mu + scale * (base.xMax - base.mean);
+
+      return {
+        ...base,
+        xMin: Math.min(low, high),
+        xMax: Math.max(low, high),
+        mean: mu,
+        sd: sigma,
+        sample: () => mu + scale * (base.sample() - base.mean),
+        density: x => base.density((x - mu) / scale + base.mean) / scale,
+        discrete: false
+      };
+    }
+
+    function hasPendingChanges() {
+      return pendingSampleSize !== activeSampleSize ||
+             distSelect.value !== activeDistributionValue ||
+             pendingMean !== activeMean ||
+             pendingSd !== activeSd ||
+             pendingChiDf !== activeChiDf;
+    }
+
+    function drawOneSample(forceUpdate = false) {
+      const dist = getDisplayDistribution();
+      const n = getSampleSize();
+      currentSample = Array.from({ length: n }, () => dist.sample());
+      sampleMeans.push(mean(currentSample));
+
+      const shouldUpdate = forceUpdate ||
+        sampleMeans.length <= updateEveryAfterThreshold ||
+        sampleMeans.length % updateEveryNSamples === 0;
+
+      if (shouldUpdate) updatePlots();
+    }
+
+    function go() {
+      if (running) return;
+      if (hasPendingChanges()) reset();
+      running = true;
+      drawOneSample(true);
+      timer = setInterval(() => {
+        if (sampleMeans.length > updateEveryAfterThreshold) {
+          for (let i = 0; i < fastBatchSize; i++) drawOneSample(false);
+        } else {
+          drawOneSample(false);
+        }
+      }, msPerIteration);
+    }
+
+    function step() {
+      if (running) pause();
+      if (hasPendingChanges()) reset();
+      drawOneSample(true);
+      pause();
+    }
+
+    function pause() {
+      running = false;
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function reset() {
+      pause();
+      activeSampleSize = pendingSampleSize;
+      activeDistributionValue = distSelect.value;
+      activeMean = pendingMean;
+      activeSd = pendingSd;
+      activeChiDf = pendingChiDf;
+      sampleMeans = [];
+      currentSample = [];
+      syncControlValuesToPending();
+      updatePlots();
+    }
+
+    function updateStatsText() {
+      const dist = getDisplayDistribution();
+      if (dist.noFiniteMoments) {
+        statsRow.textContent = `Population: location = ${dist.location.toFixed(3)}, scale = ${dist.scale.toFixed(3)}; μₓ and σₓ are undefined`;
+      } else {
+        statsRow.textContent = `Population: μₓ = ${dist.mean.toFixed(3)}, σₓ = ${dist.sd.toFixed(3)}`;
+      }
+
+      const n = getSampleSize();
+      const theoreticalMean = dist.mean;
+      const theoreticalSe = dist.sd / Math.sqrt(n);
+
+      if (sampleMeans.length === 0) {
+        samplingStatsRow.textContent = "Sampling distribution: x̄ = –, sₓ = –";
+      } else {
+        const m = mean(sampleMeans);
+        const sd = sampleSd(sampleMeans);
+        samplingStatsRow.textContent = `Sampling distribution: x̄ = ${m.toFixed(3)}, sₓ = ${sd.toFixed(3)}`;
+      }
+    }
+
+    function updateControlsText() {
+      chiDfControl.style.display = distSelect.value === "chisq" ? "flex" : "none";
+    }
+
+    function syncControlValuesToPending() {
+      sampleSizeInput.value = pendingSampleSize;
+      sampleSizeSlider.value = sampleSizeToSlider(pendingSampleSize);
+      populationMeanInput.value = pendingMean;
+      populationSdInput.value = pendingSd;
+      chiDfInput.value = pendingChiDf;
+      updateControlsText();
+    }
+
+    function populationTraces(dist) {
+      if (dist.discrete) {
+        const xs = [];
+        const ys = [];
+        const markerX = [];
+        const markerY = [];
+        for (const x of dist.support) {
+          const p = dist.pmf(x);
+          xs.push(x, x, null);
+          ys.push(0, p, null);
+          markerX.push(x);
+          markerY.push(p);
+        }
+        return [
+          {
+            x: xs,
+            y: ys,
+            type: "scatter",
+            mode: "lines",
+            name: "Population probability",
+            line: { width: 3, color: "black" },
+            hoverinfo: "skip"
+          },
+          {
+            x: markerX,
+            y: markerY,
+            type: "scatter",
+            mode: "markers",
+            name: "Probability mass",
+            marker: { size: 8, color: "black" },
+            hovertemplate: "x = %{x:.3f}<br>P(x) = %{y:.3f}<extra></extra>"
+          }
+        ];
+      }
+
+      const xs = linspace(dist.xMin, dist.xMax, 400);
+      return [{
+        x: xs,
+        y: xs.map(dist.density),
+        type: "scatter",
+        mode: "lines",
+        name: "Population density",
+        line: { width: 2, color: "black" },
+        hovertemplate: "x = %{x:.2f}<br>density = %{y:.3f}<extra></extra>"
+      }];
+    }
+
+    function sampleTrace() {
+      return {
+        x: currentSample,
+        y: currentSample.map(() => 0),
+        type: "scatter",
+        mode: "markers",
+        name: "Current sample",
+        marker: {
+          symbol: "circle",
+          size: 9,
+          color: "green",
+          line: { width: 0 }
+        },
+        hovertemplate: "sample value = %{x:.3f}<extra></extra>"
+      };
+    }
+
+    function getSamplingAxisLimits() {
+      const dist = getDisplayDistribution();
+
+      if (matchPopulationRangeToggle.checked) {
+        return {
+          xMin: dist.xMin,
+          xMax: dist.xMax,
+          binWidth: (dist.xMax - dist.xMin) / samplingBinCount
+        };
+      }
+
+      if (dist.noFiniteMoments) {
+        const center = dist.location;
+        const halfRange = 10 * dist.scale;
+        return {
+          xMin: center - halfRange,
+          xMax: center + halfRange,
+          binWidth: (2 * halfRange) / samplingBinCount
+        };
+      }
+
+      const se = dist.sd / Math.sqrt(getSampleSize());
+      return {
+        xMin: dist.mean - samplingRangeInSE * se,
+        xMax: dist.mean + samplingRangeInSE * se,
+        binWidth: (2 * samplingRangeInSE * se) / samplingBinCount
+      };
+    }
+
+    function histogramOutlineTrace() {
+      const limits = getSamplingAxisLimits();
+      const xMin = limits.xMin;
+      const xMax = limits.xMax;
+      const binWidth = limits.binWidth;
+      const binCount = samplingBinCount;
+      const counts = Array(binCount).fill(0);
+
+      for (const value of sampleMeans) {
+        if (value < xMin || value > xMax) continue;
+        let b = Math.floor((value - xMin) / binWidth);
+        if (b < 0) b = 0;
+        if (b >= binCount) b = binCount - 1;
+        counts[b]++;
+      }
+
+      const xOutline = [xMin];
+      const yOutline = [0];
+      for (let i = 0; i < binCount; i++) {
+        const left = xMin + i * binWidth;
+        const right = left + binWidth;
+        const c = counts[i];
+        xOutline.push(left, left, right, right);
+        yOutline.push(i === 0 ? 0 : counts[i - 1], c, c, i === binCount - 1 ? 0 : c);
+      }
+      xOutline.push(xMax);
+      yOutline.push(0);
+
+      return {
+        x: xOutline,
+        y: yOutline,
+        type: "scatter",
+        mode: "lines",
+        name: `Sampling distribution of ${sampleMeans.length} means`,
+        line: { width: 2, color: "green" },
+        hoverinfo: "skip"
+      };
+    }
+
+    
+    function convolveArrays(a, b) {
+      const out = Array(a.length + b.length - 1).fill(0);
+
+      for (let i = 0; i < a.length; i++) {
+        for (let j = 0; j < b.length; j++) {
+          out[i + j] += a[i] * b[j];
+        }
+      }
+
+      return out;
+    }
+
+    function theoreticalSamplingTrace() {
+      const dist = getDisplayDistribution();
+
+      if (dist.noFiniteMoments) {
+        return {
+          x: [],
+          y: [],
+          type: "scatter",
+          mode: "lines",
+          name: "No theoretical prediction",
+          hoverinfo: "skip"
+        };
+      }
+
+      const n = getSampleSize();
+
+      // Avoid expensive convolutions for huge n
+      if (n > 25) {
+        return {
+          x: [],
+          y: [],
+          type: "scatter",
+          mode: "lines",
+          name: "Theoretical distribution disabled for n > 25",
+          hoverinfo: "skip"
+        };
+      }
+
+      const gridN = 400;
+
+      const popXs = linspace(dist.xMin, dist.xMax, gridN);
+      const dx = popXs[1] - popXs[0];
+
+      let popPdf = popXs.map(x => {
+        if (dist.discrete) return dist.pmf(x);
+        return dist.density(x);
+      });
+
+      const total = popPdf.reduce((a, b) => a + b, 0) * dx;
+      popPdf = popPdf.map(v => v / total);
+
+      let conv = popPdf.slice();
+
+      for (let k = 1; k < n; k++) {
+        conv = convolveArrays(conv, popPdf).map(v => v * dx);
+      }
+
+      const sumMin = n * dist.xMin;
+      const sumMax = n * dist.xMax;
+
+      const sumXs = linspace(sumMin, sumMax, conv.length);
+
+      const meanXs = sumXs.map(x => x / n);
+      const meanPdf = conv.map(v => v * n);
+
+      const limits = getSamplingAxisLimits();
+      const scale = sampleMeans.length * limits.binWidth;
+
+      return {
+        x: meanXs,
+        y: meanPdf.map(v => v * scale),
+        type: "scatter",
+        mode: "lines",
+        name: "Exact theoretical distribution",
+        line: {
+          width: 2,
+          color: "rgba(200,0,0,0.85)"
+        },
+        hovertemplate: "x̄ = %{x:.3f}<br>theoretical density<extra></extra>"
+      };
+    }
+
+
+    function normalTheoryTrace() {
+      const dist = getDisplayDistribution();
+      if (dist.noFiniteMoments) {
+        return {
+          x: [],
+          y: [],
+          type: "scatter",
+          mode: "lines",
+          name: "No normal prediction: μₓ and σₓ are undefined",
+          hoverinfo: "skip"
+        };
+      }
+      const limits = getSamplingAxisLimits();
+      const se = dist.sd / Math.sqrt(getSampleSize());
+      const xs = linspace(limits.xMin, limits.xMax, 300);
+      const scale = sampleMeans.length * limits.binWidth;
+      return {
+        x: xs,
+        y: xs.map(x => normalPdf(x, dist.mean, se) * scale),
+        type: "scatter",
+        mode: "lines",
+        name: `Normal prediction: μₓ̄ = ${dist.mean.toFixed(3)}, σₓ̄ = ${se.toFixed(3)}`,
+        line: { width: 1.5, dash: "dash", color: "rgba(0, 0, 0, 0.5)" },
+        hovertemplate: "x = %{x:.3f}<br>normal approximation<extra></extra>"
+      };
+    }
+
+    function updatePlots() {
+      updateControlsText();
+      updateStatsText();
+
+      const dist = getDisplayDistribution();
+      const popData = [...populationTraces(dist), sampleTrace()];
+
+      const popYMax = dist.discrete ? 0.6 : Math.max(...linspace(dist.xMin, dist.xMax, 200).map(dist.density)) * 1.12;
+      const popLayout = {
+        margin: { l: 55, r: 20, t: 22, b: 45 },
+        xaxis: { title: "Population values", range: [dist.xMin, dist.xMax], zeroline: false },
+        yaxis: { title: dist.discrete ? "Probability" : "Density", range: [-0.06 * popYMax, popYMax], zeroline: true },
+        showlegend: false,
+        paper_bgcolor: "white",
+        plot_bgcolor: "white"
+      };
+      Plotly.react("populationPlot", popData, popLayout, { responsive: true, displayModeBar: false });
+
+      
+      const samplingData = [histogramOutlineTrace()];
+
+      if (theoryToggle.checked) {
+        samplingData.push(theoreticalSamplingTrace());
+      }
+
+      if (normalToggle.checked) {
+        samplingData.push(normalTheoryTrace());
+      }
+
+      const samplingLimits = getSamplingAxisLimits();
+      const samplingYMax = Math.max(
+        1,
+        ...samplingData.flatMap(trace => trace.y || []).filter(Number.isFinite)
+      );
+      const samplingLayout = {
+        margin: { l: 55, r: 20, t: 22, b: 45 },
+        xaxis: { title: "Sample mean", range: [samplingLimits.xMin, samplingLimits.xMax], zeroline: false },
+        yaxis: { title: "Count", range: [0, samplingYMax * 1.12], showline: false, zeroline: false },
+        showlegend: true,
+        legend: { orientation: "h", x: 0, y: 1.15 },
+        paper_bgcolor: "white",
+        plot_bgcolor: "white"
+      };
+      Plotly.react("samplingPlot", samplingData, samplingLayout, { responsive: true, displayModeBar: false });
+    }
+
+    goBtn.addEventListener("click", go);
+    stepBtn.addEventListener("click", step);
+    pauseBtn.addEventListener("click", pause);
+    resetBtn.addEventListener("click", reset);
+    normalToggle.addEventListener("change", updatePlots);
+    theoryToggle.addEventListener("change", updatePlots);
+    matchPopulationRangeToggle.addEventListener("change", updatePlots);
+
+    sampleSizeSlider.addEventListener("input", () => {
+      pendingSampleSize = sliderToSampleSize(sampleSizeSlider.value);
+      sampleSizeInput.value = pendingSampleSize;
+      reset();
+    });
+
+    sampleSizeInput.addEventListener("input", () => {
+      pendingSampleSize = cleanSampleSize(sampleSizeInput.value);
+      sampleSizeSlider.value = sampleSizeToSlider(pendingSampleSize);
+      updateControlsText();
+    });
+
+    sampleSizeInput.addEventListener("change", () => {
+      pendingSampleSize = cleanSampleSize(sampleSizeInput.value);
+      sampleSizeInput.value = pendingSampleSize;
+      sampleSizeSlider.value = sampleSizeToSlider(pendingSampleSize);
+      reset();
+    });
+
+    distSelect.addEventListener("change", reset);
+
+    chiDfInput.addEventListener("input", () => {
+      const value = Number(chiDfInput.value);
+      if (Number.isFinite(value) && value >= 1) pendingChiDf = Math.max(1, Math.min(50, Math.round(value)));
+      updateControlsText();
+    });
+
+    chiDfInput.addEventListener("change", () => {
+      const value = Number(chiDfInput.value);
+      pendingChiDf = Number.isFinite(value) ? Math.max(1, Math.min(50, Math.round(value))) : activeChiDf;
+      chiDfInput.value = pendingChiDf;
+      reset();
+    });
+
+    populationMeanInput.addEventListener("input", () => {
+      const raw = populationMeanInput.value;
+      if (raw === "" || raw === "-" || raw === "." || raw === "-.") return;
+      const value = Number(raw);
+      if (Number.isFinite(value)) pendingMean = value;
+      updateControlsText();
+    });
+
+    populationMeanInput.addEventListener("change", () => {
+      const value = Number(populationMeanInput.value);
+      pendingMean = Number.isFinite(value) ? value : activeMean;
+      populationMeanInput.value = pendingMean;
+      reset();
+    });
+
+    populationSdInput.addEventListener("input", () => {
+      const raw = populationSdInput.value;
+      if (raw === "" || raw === ".") return;
+      const value = Number(raw);
+      if (Number.isFinite(value) && value > 0) pendingSd = value;
+      updateControlsText();
+    });
+
+    populationSdInput.addEventListener("change", () => {
+      const value = Number(populationSdInput.value);
+      pendingSd = Number.isFinite(value) ? Math.max(0.001, value) : activeSd;
+      populationSdInput.value = pendingSd;
+      reset();
+    });
+
+    window.addEventListener("resize", () => {
+      Plotly.Plots.resize("populationPlot");
+      Plotly.Plots.resize("samplingPlot");
+    });
+
+    syncControlValuesToPending();
+    updatePlots();
+  </script>
 </body>
 </html>
