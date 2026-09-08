@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive teaching demonstrations by Geoffrey M. Boynton, University of Washington.">
+  <title>Interactive Teaching Demonstrations | Geoffrey M. Boynton</title>
+
+  <style>
+    :root {
+      --uw-purple: #4b2e83;
+      --uw-purple-dark: #2f1b55;
+      --uw-gold: #b7a57a;
+      --ink: #202124;
+      --muted: #62666d;
+      --line: #e3e5e8;
+      --paper: #ffffff;
+      --wash: #f6f5f8;
+      --shadow: 0 8px 24px rgba(29, 20, 46, 0.08);
+      --radius: 16px;
+      --max-width: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--wash);
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at 85% 20%, rgba(183,165,122,0.24), transparent 28%),
+        linear-gradient(135deg, var(--uw-purple-dark), var(--uw-purple));
+      color: white;
+      padding: 56px 24px 48px;
+    }
+
+    .hero-inner,
+    main,
+    footer .footer-inner {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e8dfc9;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(2.1rem, 5vw, 4rem);
+      line-height: 1.06;
+      letter-spacing: -0.035em;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 18px 0 0;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: rgba(255,255,255,0.9);
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .hero-links a {
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.42);
+      background: rgba(255,255,255,0.08);
+      font-weight: 650;
+      font-size: 0.94rem;
+    }
+
+    .hero-links a:hover,
+    .hero-links a:focus-visible {
+      background: rgba(255,255,255,0.16);
+      outline: none;
+    }
+
+    main {
+      padding: 38px 0 58px;
+    }
+
+    .intro {
+      margin-bottom: 30px;
+      color: var(--muted);
+      max-width: 860px;
+    }
+
+    section {
+      margin-top: 38px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 9px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--uw-purple-dark);
+      font-size: 1.55rem;
+      letter-spacing: -0.015em;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 235px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .tag {
+      width: fit-content;
+      margin-bottom: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #f0edf6;
+      color: var(--uw-purple);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+    }
+
+    .card h3 {
+      margin: 0;
+      color: var(--uw-purple-dark);
+      font-size: 1.28rem;
+      line-height: 1.25;
+    }
+
+    .card p {
+      margin: 10px 0 18px;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .button {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: var(--uw-purple);
+      color: white;
+    }
+
+    .primary:hover,
+    .primary:focus-visible {
+      background: var(--uw-purple-dark);
+    }
+
+    .secondary {
+      background: #f3f3f5;
+      color: #343238;
+      border: 1px solid #dddde2;
+    }
+
+    .secondary:hover,
+    .secondary:focus-visible {
+      background: #e9e9ed;
+    }
+
+    footer {
+      border-top: 5px solid var(--uw-gold);
+      background: #242126;
+      color: #dad7de;
+      padding: 28px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 14px 24px;
+      align-items: center;
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    footer a {
+      color: white;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        padding-top: 42px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: auto;
+      }
+
+      .hero-inner,
+      main,
+      footer .footer-inner {
+        width: min(var(--max-width), calc(100% - 28px));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Interactive Teaching Demos</h1>
+      <p>
+        Browser-based demonstrations for statistics, perception, geometry, and related teaching.
+       The source code is publicly available at <a href="https://github.com/gboynton" target="_blank" rel="noopener">GitHub: gboynton</a>.
+      </p>
+
+      <nav class="hero-links" aria-label="Page sections">
+        <a href="#statistics">Statistics</a>
+        <a href="#vision">Vision &amp; Perception</a>
+        <a href="#geometry">Geometry</a>
+        <a href="#other">Physics &amp; Games</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <p class="intro">
+      These demonstrations are intended for classroom use and exploration. Most are self-contained
+      HTML/JavaScript pages: choose a module below to launch it, or follow the source link to inspect,
+      download, or season to taste.
+    </p>
+
+    <p> Geoffrey M. Boynton, Department of Psychology, University of Washington</p>
+
+    <section id="statistics">
+      <div class="section-heading">
+        <h2>Statistics</h2>
+        <span class="count">4 modules</span>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Sampling distributions</span>
+          <h3>Central Limit Theorem</h3>
+          <p>
+            Explore how sampling distributions emerge from different population distributions.
+            Adjust sample size and population parameters, sample repeatedly, and compare the results
+            with theoretical and normal predictions.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/clt-interactive/" target="_blank" rel="noopener">Launch Demo</a>
+            <a class="button secondary" href="https://github.com/gboynton/clt-interactive" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="tag">Probability</span>
+          <h3>Normal Distribution</h3>
+          <p>
+            An interactive demonstration of areas under the normal distribution, useful for
+            visualizing probabilities, cutoffs, and the relationship between locations on the
+            distribution and enclosed area.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/normal-distribution-demo/" target="_blank" rel="noopener">Launch Demo</a>
+            <a class="button secondary" href="https://github.com/gboynton/normal-distribution-demo" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="tag">Hypothesis testing</span>
+          <h3>Statistical Power for a z-Test</h3>
+          <p>
+            Visualize statistical power using the classic pair of normal distributions. Adjust the
+            null and true means, standard deviation, sample size, alpha level, and number of tails.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/power_z/" target="_blank" rel="noopener">Launch Demo</a>
+            <a class="button secondary" href="https://github.com/gboynton/power_z" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="tag">ANOVA</span>
+          <h3>The F Statistic</h3>
+          <p>
+            Demonstrates the F statistic as a ratio of variability between group means to variability
+            within groups, with repeated sampling to make the logic of one-factor ANOVA visible.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/F/" target="_blank" rel="noopener">Launch Demo</a>
+            <a class="button secondary" href="https://github.com/gboynton/F" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="vision">
+      <div class="section-heading">
+        <h2>Vision &amp; Perception</h2>
+        <span class="count">2 modules</span>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Brightness perception</span>
+          <h3>Checker-Shadow Illusion</h3>
+          <p>
+            An interactive version of Edward Adelson's classic checker-shadow illusion, illustrating
+            how context and inferred illumination can strongly influence perceived surface brightness.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/checker-shadow-illusion-demo/" target="_blank" rel="noopener">Launch Demo</a>
+            <a class="button secondary" href="https://github.com/gboynton/checker-shadow-illusion-demo" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="tag">Brightness perception</span>
+          <h3>Brightness Illusion</h3>
+          <p>
+            A browser-based perceptual demonstration showing how surrounding image structure changes
+            the appearance of physically defined luminance or brightness.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/brightness-illusion-demo/" target="_blank" rel="noopener">Launch Demo</a>
+            <a class="button secondary" href="https://github.com/gboynton/brightness-illusion-demo" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="geometry">
+      <div class="section-heading">
+        <h2>Geometry</h2>
+        <span class="count">1 collection</span>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Circle theorems</span>
+          <h3>Interactive Circle-Theorem Demos</h3>
+          <p>
+            A collection of interactive geometry demonstrations covering circle theorems including
+            angles at the center, cyclic quadrilaterals, tangents, chords, semicircles, and related results.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/circle-theorem-demos/" target="_blank" rel="noopener">Launch Collection</a>
+            <a class="button secondary" href="https://github.com/gboynton/circle-theorem-demos" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="other">
+      <div class="section-heading">
+        <h2>Physics &amp; Games</h2>
+        <span class="count">1 module</span>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <span class="tag">Projectile motion</span>
+          <h3>Ballistics</h3>
+          <p>
+            A two-player browser game based on projectile motion, with adjustable firing parameters
+            and environmental effects. A playful way to explore trajectories and basic ballistics.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://gboynton.github.io/ballistics/" target="_blank" rel="noopener">Launch Game</a>
+            <a class="button secondary" href="https://github.com/gboynton/ballistics" target="_blank" rel="noopener">View Source</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>
+        Geoffrey M. Boynton · Department of Psychology · University of Washington
+      </p>
+      <p>
+        <a href="https://github.com/gboynton" target="_blank" rel="noopener">GitHub: gboynton</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
